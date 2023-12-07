@@ -12,13 +12,13 @@ Fecha: [16/11/2023]
 # Segmento 1: Importar bibliotecas
 # ----------------------------------------------
 import os  #Libreria para listar archivos de una ruta
-import time
+import time 
 import pandas as pd
 import numpy as np
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 from openpyxl import load_workbook
-from openpyxl.styles import PatternFill, Font
+from openpyxl.styles import PatternFill, Font 
 # ----------------------------------------------
 
 
@@ -36,7 +36,7 @@ print(' **  Se esta tomando la data de Ventas Historicas Reales ** ')
 # Segmento 2: Lectura de archivos y asignación a dataframes
 # ----------------------------------------------
 #----  Base Ventas Reales
-# Especifica las columnas que deseas que sean de tipo
+# Especifica las columnas que deseas que sean de tipo texto
 Base_Texto = ['COD ARTICULO','Mes']
 BaseVentasReal = pd.read_excel(
     io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/VentasReales/Base Real Historica.xlsx'
@@ -71,13 +71,12 @@ df_BdSinExtra = pd.DataFrame(BdSinExtra)
 # ----------------------------------------------
 # Segmento 3: Creación de funciones para transformaciones
 # ----------------------------------------------
-# Función personalizada para Asignar el código 
-# articulo sin extracontenido cuando aplique
+# Función personalizada para Asignar el código articulo sin extracontenido cuando aplique
 # ---
 def fn_CodSinExtra(row) :
     if row['TIPO_OFERTA'] == 'OS2':
         # Lógica para la primer condición y el merge correspondiente
-        merge_result = df_BdSinExtra[df_BdSinExtra['CODI_ARTICULO EXTRAC'] ==
+        merge_result = df_BdSinExtra[df_BdSinExtra['CODI_ARTICULO EXTRAC'] == 
                                      row['COD ARTICULO']]['COD ARTICULO REG'].values
         if len(merge_result) > 0:
             return merge_result[0]
@@ -87,7 +86,7 @@ def fn_CodSinExtra(row) :
                                      row['COD ARTICULO']]['COD ARTICULO REG'].values
         if len(merge_result) > 0:
             return merge_result[0]
-    # Retornar el valor original si no se cumple ninguna condición
+    # Retornar el valor original si no se cumple ninguna de las condiciones
     return row['COD ARTICULO']
 # ---
 # Crear una función personalizada para Asignar
@@ -117,7 +116,6 @@ def fn_DescSinExtra(row):
 # Aplicar la función a cada fila del DataFrame
 df_BaseVentasReal['COD ARTICULO SIN EXTRAC'] = df_BaseVentasReal.apply(fn_CodSinExtra, axis=1)
 df_BaseVentasReal['ARTICULO SIN EXTRAC'] = df_BaseVentasReal.apply(fn_DescSinExtra, axis=1)
-# ---
 # ----------------------------------------------
 
 
@@ -162,7 +160,7 @@ df_filtradoVolumen = df_filtradoVolumen.drop(columns=['fecha'])
 # Imprimir el DataFrame resultante para validar
 # que se tomo el historico correcto
 df_filtradoVolumen.to_excel(
-    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/Validación/ValidaciónMesVolumen.xlsx'
+    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/4) Validación/ValidaciónMesVolumen.xlsx'
     , index=False
     , sheet_name='Hoja1'
     , engine='openpyxl')
@@ -172,7 +170,7 @@ df_filtradoVolumen.to_excel(
 # ----------------------------------------------
 # Segmento 6: Porcentaje Individual y homologación tabla dinamica
 # ----------------------------------------------
-#---- Tablas que se requieren unicamente
+#---- Columnas que se requieren unicamente
 columnas_tb_dinamica1 = ['CODI_REGIONAL', 'CODI_CANALAGRUP', 'CODI_CANALSUPE'
                          , 'CLIENTE', 'NOMBRE_CATEGORIA', 'DESC_GRUPO'
                          , 'SUBGRUPO', 'COD ARTICULO','ARTICULO', 'MARCA'
@@ -189,10 +187,7 @@ df_agrupado1 = df_tabla_dinamica1.groupby(['CODI_REGIONAL', 'CODI_CANALAGRUP', '
 total_por_categoria = df_agrupado1.groupby('NOMBRE_CATEGORIA')['KILO_NETO'].sum().reset_index()
 total_por_categoria.columns = ['NOMBRE_CATEGORIA'
                             , 'KILONETOCATEGORIA']
-df_agrupado1.to_excel('C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/VolumenProyectado111.xlsx'
-                    , index=False
-                    , sheet_name='Hoja1'
-                    , engine='openpyxl')
+
 #---- Fusionar df_agrupado1 con el total por categoría
 df_agrupado1 = pd.merge(df_agrupado1
                         , total_por_categoria
@@ -208,11 +203,12 @@ df_agrupado1['PORC_TOTALCATEGORIA'] = (df_agrupado1['KILO_NETO']
 # ----------------------------------------------
 # Validación del archivo a valorizar para cargar en un dataframe
 # --- Ruta del directorio
-RUTA = 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/VolumenDeProyección'
+RUTA = 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/2) VolumenDeProyección'
 # Nombre de los archivos que esperamos encontrar
 BDKILOSVAL = 'bdKilosVal.xlsx'
 BDCATEGORIA = 'bdCategoria.xlsx'
 BDCANAL = 'bdCanal.xlsx'
+BDPLANEACION = 'bdPlaneación.xlsx'
 
 while True:
     # Lista los archivos en la ruta
@@ -224,12 +220,12 @@ while True:
         print(f" El archivo {BDKILOSVAL} está presente. Realizar función para Ventas.")
         # Aquí puedes agregar la lógica específica para el archivo Ventas bdKilosVal.xlsx
         bdKilosVal = pd.read_excel(
-            io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/VolumenDeProyección/bdKilosVal.xlsx'
+            io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/2) VolumenDeProyección/bdKilosVal.xlsx'
                                     , sheet_name='Hoja1'
                                     , header=0
                                     , names=None
                                     , index_col = None
-                                    , usecols= 'A:R'
+                                    , usecols= 'A:T'
                                     , engine= 'openpyxl'
                                     , dtype={col: str for col in Base_Texto})
         df_bdKilosVal = pd.DataFrame(bdKilosVal)
@@ -237,16 +233,172 @@ while True:
         df_ordenado = df_ordenado.rename(columns={'KILO_NETO': 'KILO_PROYECTADO','AÑO': 'AÑO_VAL','MES': 'MES_VAL'})
         df_ordenado.to_excel('C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/VolumenProyectado.xlsx'
             , index=False
-            , sheet_name='Hoja1'                                               
+            , sheet_name='Hoja1'
             , engine='openpyxl')
 #----
+        print('\n---------------------------------\n')
+        break
+    elif BDPLANEACION in FILES:
+        print('\n---------------------------------\n')
+        print(f" El archivo {BDPLANEACION} está presente. Se realizará la transformación para Ventas.")
+        # ----------------------------------------------
+        # Segmento A: Lectura y transformación del archivo de finanzas
+        # ----------------------------------------------
+        #--- Base SOP
+        Column_Text = ['Cod Padre Canal SM Cadena','Mes']# Especifica las columnas que deseas que sean de tipo
+        df_Finanzas = pd.read_excel(
+            io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/1) Plantillas/bdPlaneación.xlsx'
+                                    , sheet_name='BASE COG'
+                                    , header=0
+                                    , names=None
+                                    , index_col=None
+                                    , usecols='A:R'
+                                    , engine='openpyxl'
+                                    , dtype={col: str for col in Column_Text}
+                                    ).copy()
+        #--- Base SOP
+        Colm_Text = ['CODIGO_PADRE']# Especifica las columnas que deseas que sean de tipo
+        bdSuperMercados = pd.read_excel(
+            io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/1) Plantillas/Base Supermercados.xlsx'
+                                    , sheet_name='Base Cadenas'
+                                    , header=0
+                                    , names=None
+                                    , index_col = None
+                                    , usecols= 'A:D'
+                                    , engine= 'openpyxl'
+                                    , dtype={col: str for col in Colm_Text}#---- Cast to type text
+                                                ) 
+        df_SuperMercados = pd.DataFrame(bdSuperMercados)
+        #print(df_SuperMercados)
+        # ----------------------------------------------
+
+
+        # ----------------------------------------------
+        # Segmento B: Extracción del Cliente
+        # ----------------------------------------------
+        def fn_Clientes(row):
+            # Verificar si el canal es 'SM'
+            if row['COD CANAL SUPERIOR'] == 'SM':
+                # Obtener la cadena correspondiente si existe
+                merge_result = df_SuperMercados[df_SuperMercados['CODIGO_PADRE'] == 
+                                                row['Cod Padre Canal SM Cadena']]['CADENA'].values
+                return merge_result[0] if len(merge_result) > 0 else 'Validar'
+            # Retornar el valor original si no se cumple ninguna condición
+            else:
+                return 'No Aplica'
+        # ----------------------------------------------
+        df_Finanzas['CLIENTE'] = df_Finanzas.apply(fn_Clientes, axis=1)
+        # ----------------------------------------------
+        # Segmento C: Funciones para ajustar al formato correcto
+        # ----------------------------------------------
+        # Función para convertir crear el periodo
+        def convert_Periodo(fecha_str):
+            #--- Extraer los últimos dos dígitos del año y el mes
+            year = fecha_str.split('-')[0]
+            month_Text = fecha_str.split('-')[1]
+            #--- Convertir el mes a número con dos dígitos
+            month = '{:02d}'.format(int(datetime.strptime(month_Text, '%b').strftime('%m')))
+            #--- Devolver el resultado final
+            return f"1{year[-2:]}{month}"
+        # Aplicar la función a la columna 'mes' del DataFrame
+        df_Finanzas['PERIODO'] = df_Finanzas['Mes'].apply(convert_Periodo)
+        # ----------------------------------------------
+        # Función para convertir crear el periodo
+        def convert_Q(row):
+            # Convertir el valor de la columna 'Mes' a objeto datetime
+            fecha = pd.to_datetime(row['Mes'], format='%y-%b')
+            # Obtener el cuartil del año al que pertenece el mes
+            cuartil = pd.cut([fecha.month-1], bins=[-1, 2, 5, 8, 11], labels=['Q1', 'Q2', 'Q3', 'Q4'])[0]
+            return cuartil
+        # Aplicar la función a cada fila del DataFrame
+        df_Finanzas['Q'] = df_Finanzas.apply(convert_Q, axis=1)
+        # ----------------------------------------------
+        # Función para convertir crear el periodo
+        def convert_Año(fecha_str):
+            # Extraer los últimos dos dígitos del año y devolver el año completo
+            año_completo = 2000 + int(fecha_str[:2])
+            return año_completo
+        # Aplicar la función a la columna 'mes' del DataFrame
+        df_Finanzas['AÑO_VAL'] = df_Finanzas['Mes'].apply(convert_Año)
+        # ----------------------------------------------
+        # Función para convertir 'yy-mmm' a 'yyyy'
+        def convert_Mes(fecha_str):
+            #--- Extraer los últimos dos dígitos del año y el mes
+            month_Text = fecha_str.split('-')[1]
+            #--- Convertir el mes a número con dos dígitos
+            month = '{:02d}'.format(int(datetime.strptime(month_Text, '%b').strftime('%m')))
+            #--- Devolver el resultado final
+            return f"{month}"
+        # Aplicar la función a la columna 'mes' del DataFrame
+        df_Finanzas['MES_VAL'] = df_Finanzas['Mes'].apply(convert_Mes)
+        # Crear una nueva columna con un texto específico
+        text_Esc= 'SOP'
+        df_Finanzas['Escenario'] = text_Esc
+        text_Esc= 'No aplica'
+        df_Finanzas['TIPO_OFERTA'] = text_Esc
+        #text_Esc= 'No aplica'
+        df_Finanzas['NOMBRE_TIPOOFERTA'] = 'No aplica'
+        # ----------------------------------------------
+
+
+        # ----------------------------------------------
+        # Segmento D: Renombre de Columnas
+        # ----------------------------------------------
+        df_Finanzas.rename(columns={'COD REGIONAL': 'CODI_REGIONAL'
+                                    ,'COD CANAL AGRUPADO': 'CODI_CANALAGRUP'
+                                    ,'COD CANAL SUPERIOR': 'CODI_CANALSUPE'
+                                    #,'': 'CLIENTE'
+                                    ,'DESC. CATEGORIA': 'NOMBRE_CATEGORIA'
+                                    ,'DESC. GRUPO': 'DESC_GRUPO'
+                                    ,'DESC. SUBGRUPO': 'SUBGRUPO'
+                                    ,'NOMBRE ARTICULO': 'ARTICULO'
+                                    ,'NOMBRE MARCA': 'MARCA'
+                                    ,'DESC. PRESENTACION': 'PRESENTACIÓN'
+                                    ,'DESC. TAMAÑO': 'TAMAÑO'
+                                    #,'': 'TIPO_OFERTA'
+                                    #,'': 'NOMBRE_TIPOOFERTA'
+                                    ,'kilos': 'KILO_PROYECTADO'
+                                    }, inplace=True)
+        # ---------------------------------------------
+
+
+        # ----------------------------------------------
+        # Segmento E: Reorganizar las columnas en un orden específico
+        # ----------------------------------------------
+        # Configurar la opción para mostrar todas las columnas
+        pd.set_option('display.max_columns', None)
+        df_Finanzas.drop(['REGION', 'COD SECTOR', 'Cod Padre Canal SM Cadena', 'Mes', 'Volumen', 'Cantidades'], axis=1, inplace=True)
+        df_Finanzas.sort_values(['PERIODO', 'CODI_REGIONAL', 'CODI_CANALAGRUP'
+                            , 'CODI_CANALSUPE'#,'Cod Padre Canal SM Cadena'
+                            , 'CLIENTE', 'NOMBRE_CATEGORIA'
+                            , 'DESC_GRUPO', 'SUBGRUPO','COD ARTICULO'
+                            , 'ARTICULO', 'MARCA', 'PRESENTACIÓN'
+                            , 'TAMAÑO', 'TIPO_OFERTA', 'NOMBRE_TIPOOFERTA'
+                            , 'Q', 'AÑO_VAL', 'MES_VAL', 'Escenario', 'KILO_PROYECTADO'], inplace=True)
+        #---
+        df_Finanzas = df_Finanzas.groupby(['PERIODO', 'CODI_REGIONAL', 'CODI_CANALAGRUP'
+                                            , 'CODI_CANALSUPE'#,'Cod Padre Canal SM Cadena'
+                                            , 'CLIENTE', 'NOMBRE_CATEGORIA'
+                                            , 'DESC_GRUPO', 'SUBGRUPO','COD ARTICULO'
+                                            , 'ARTICULO', 'MARCA', 'PRESENTACIÓN'
+                                            , 'TAMAÑO', 'TIPO_OFERTA', 'NOMBRE_TIPOOFERTA'
+                                            , 'Q', 'AÑO_VAL', 'MES_VAL', 'Escenario']).sum().reset_index()
+        # ----------------------------------------------
+        df_ordenado = df_Finanzas.copy()
+        #df_ordenado = df_ordenado.rename(columns={'KILO_NETO': 'KILO_PROYECTADO','AÑO': 'AÑO_VAL','MES': 'MES_VAL'})
+        df_ordenado.to_excel('C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/VolumenProyectado.xlsx'
+            , index=False
+            , sheet_name='Hoja1'
+            , engine='openpyxl')
+        #----
+        print("** El archivo VolumenProyectado.xlsx se genero de manera exitosa y lo podrás visualizar en la ruta. **")
         print('\n---------------------------------\n')
         break
     elif BDCATEGORIA in FILES:
         print('\n---------------------------------\n')
         print(f" El archivo {BDCATEGORIA} está presente. Se realizará la explosión en función para Categoría.")
         bdCategoria = pd.read_excel(
-            io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/VolumenDeProyección/bdCategoria.xlsx'
+            io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/2) VolumenDeProyección/bdCategoria.xlsx'
                                     , sheet_name='Hoja1'
                                     , header=0
                                     , names=None
@@ -304,7 +456,7 @@ while True:
         print('\n---------------------------------\n')
         print(f" El archivo {BDCANAL} está presente. Se realizará la explosión en función para Categoría.")
         bdCanal = pd.read_excel(
-            io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/VolumenDeProyección/bdCanal.xlsx'
+            io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/2) VolumenDeProyección/bdCanal.xlsx'
                                     , sheet_name='Hoja1'
                                     , header=0
                                     , names=None
@@ -405,7 +557,7 @@ df_filtradoVentas = df_filtradoVentas.sort_values('fecha', ascending=False)
 df_filtradoVentas = df_filtradoVentas.drop(columns=['fecha'])
 # Imprimir el DataFrame resultante para validar que se tomo el historico correcto
 df_filtradoVentas.to_excel(
-    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/Validación/ValidaciónMesVentas.xlsx'
+    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/4) Validación/ValidaciónMesVentas.xlsx'
     , index=False
     , sheet_name='Hoja1'
     , engine='openpyxl')
@@ -416,20 +568,15 @@ df_filtradoVentas.to_excel(
 # Segmento 9: Agrupación del Historico de Ventas
 # ----------------------------------------------
 # Columnas por las cuales se filtrará el Historico de Ventas Reales
-col_tbd_Ventas = ['CODI_REGIONAL', 'CODI_CANALAGRUP', 'CODI_CANALSUPE'
-                            , 'CLIENTE', 'NOMBRE_CATEGORIA', 'DESC_GRUPO'
-                            , 'SUBGRUPO', 'COD ARTICULO','ARTICULO', 'MARCA'
-                            , 'PRESENTACIÓN', 'TAMAÑO', 'TIPO_OFERTA'
-                            , 'NOMBRE_TIPOOFERTA','KILO_NETO'
+col_tbd_Ventas = ['CODI_REGIONAL', 'CODI_CANALSUPE'
+                            , 'CLIENTE', 'COD ARTICULO','KILO_NETO'
                             , 'VALORTOTAL_PRODREGULAR', 'VALOR_DESC'
                             , 'VALOR_DEVO', 'CARTERA' ,'DESC_POSV'
                             , 'VALOR_INVERSI_PROMOC', 'EXTRAC']
 df_tbd_Ventas = df_filtradoVentas[col_tbd_Ventas]
 # Columnas por las cuales agrupar
-col_AgrupVentas = ['CODI_REGIONAL', 'CODI_CANALAGRUP', 'CODI_CANALSUPE'
-                    , 'CLIENTE', 'NOMBRE_CATEGORIA', 'DESC_GRUPO'
-                    , 'SUBGRUPO', 'COD ARTICULO', 'MARCA'
-                    , 'PRESENTACIÓN', 'TAMAÑO', 'TIPO_OFERTA']
+col_AgrupVentas = ['CODI_REGIONAL', 'CODI_CANALSUPE'
+                            , 'CLIENTE', 'COD ARTICULO']
 #----
 # Agrupar el DataFrame
 # Puedes cambiar 'sum' a otras funciones de agregación
@@ -456,7 +603,10 @@ df_agrupadoVentas['Validación'] = np.where(
 # Segmento 10: Creación tabla para Valorizar
 # ----------------------------------------------
 # Columnas calculas agragadas al dataframe
-#df_agrupadoVentas['PRODREGULAR X KILO'] = (df_agrupadoVentas['VALORTOTAL_PRODREGULAR']
+# Constantes
+UMBRAL_LIMPIEZA = 1e-6
+# Limpiar y convertir los datos antes de realizar la división
+df_agrupadoVentas['KILO_NETO'] = df_agrupadoVentas['KILO_NETO'].apply(lambda x: 0 if abs(x) < UMBRAL_LIMPIEZA else x)  # Ajusta el umbral según tus necesidades
 # --- 'PRODREGULAR X KILO'
 df_agrupadoVentas['PRODREGULAR X KILO'] = np.where(df_agrupadoVentas['VALORTOTAL_PRODREGULAR'] != 0
                                                    , df_agrupadoVentas['VALORTOTAL_PRODREGULAR'] 
@@ -502,7 +652,7 @@ df_agrupadoVentas['EXTRAC %'].replace(-np.inf, 0, inplace=True)
 df_agrupadoVentas['LLAVE'] = df_agrupadoVentas.apply(lambda row: '_'.join(map(str, row[col_AgrupVentas])), axis=1)
 # Imprimir el DataFrame resultante para validar que se tomo el historico correcto
 df_agrupadoVentas.to_excel(
-    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/Validación/AgrupaciónFinalVentas.xlsx'
+    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/4) Validación/AgrupaciónFinalVentas.xlsx'
     , index=False
     , sheet_name='Hoja1'
     , engine='openpyxl')
@@ -512,7 +662,7 @@ df_agrupadoVolumen = df_ordenado.copy()
 # Crear una columna llave
 df_agrupadoVolumen['LLAVE'] = df_agrupadoVolumen.apply(lambda row: '_'.join(map(str, row[col_AgrupVentas])), axis=1)
 df_agrupadoVolumen.to_excel(
-    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/Validación/AgrupaciónFinalVolumen.xlsx'
+    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/4) Validación/AgrupaciónFinalVolumen.xlsx'
     , index=False
     , sheet_name='Hoja1'
     , engine='openpyxl')
@@ -522,22 +672,14 @@ df_Valorizacion = pd.merge(df_agrupadoVolumen
                         , df_agrupadoVentas
                         , on='LLAVE', how='inner')
 # ----------------------------------------------
-df_Valorizacion = df_Valorizacion.rename(columns={'NOMBRE_CATEGORIA_x': 'NOMBRE_CATEGORIA'
-                                                  , 'CODI_CANALSUPE_x': 'CODI_CANALSUPE'
+df_Valorizacion = df_Valorizacion.rename(columns={'CODI_CANALSUPE_x': 'CODI_CANALSUPE'
                                                   , 'CLIENTE_x': 'CLIENTE'
-                                                  , 'DESC_GRUPO_x': 'DESC_GRUPO'
-                                                  , 'SUBGRUPO_x': 'SUBGRUPO'
-                                                  , 'CODI_CANALAGRUP_x': 'CODI_CANALAGRUP'
                                                   , 'CODI_REGIONAL_x': 'CODI_REGIONAL'
-                                                  , 'COD ARTICULO_x': 'COD ARTICULO'
-                                                  , 'MARCA_x': 'MARCA'
-                                                  , 'PRESENTACIÓN_x': 'PRESENTACIÓN'
-                                                  , 'TAMAÑO_x': 'TAMAÑO'
-                                                  , 'TIPO_OFERTA_x': 'TIPO_OFERTA'})
+                                                  , 'COD ARTICULO_x': 'COD ARTICULO'})
 # ----------------------------------------------
 #df_Valorizacion = pd.concat([df_agrupadoVolumen,Columns_Ventas], axis=1)
 df_Valorizacion.to_excel(
-    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/Validación/AgrupaciónFinalVentas+Volumen.xlsx'
+    'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/4) Validación/AgrupaciónFinalVentas+Volumen.xlsx'
     , index=False
     , sheet_name='Hoja1'
     , engine='openpyxl')
@@ -548,7 +690,7 @@ df_Valorizacion.to_excel(
 # Segmento 12: Lectura y cruce de Archivos Editores de la Proyección
 # ----------------------------------------------
 tbIncrementos = pd.read_excel(
-    io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/ModificadoresProyección/ModificadoresProyección.xlsx'
+    io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/3) ModificadoresProyección/ModificadoresProyección.xlsx'
                             , sheet_name='Precio'
                             , header=0
                             , names=None
@@ -560,7 +702,7 @@ tbIncrementos = pd.read_excel(
 db_Incrementos = pd.DataFrame(tbIncrementos)
 # ----
 tbDescuentos = pd.read_excel(
-    io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/ModificadoresProyección/ModificadoresProyección.xlsx'
+    io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/3) ModificadoresProyección/ModificadoresProyección.xlsx'
                             , sheet_name='Descuento'
                             , header=0
                             , names=None
@@ -572,7 +714,7 @@ tbDescuentos = pd.read_excel(
 df_Descuentos = pd.DataFrame(tbDescuentos)
 # ----
 tbOfertacion = pd.read_excel(
-    io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/ModificadoresProyección/ModificadoresProyección.xlsx'
+    io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/3) ModificadoresProyección/ModificadoresProyección.xlsx'
                             , sheet_name='Ofertación'
                             , header=0
                             , names=None
@@ -584,7 +726,7 @@ tbOfertacion = pd.read_excel(
 db_Ofertacion = pd.DataFrame(tbOfertacion)
 # ----
 tbExtra = pd.read_excel(
-    io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/ModificadoresProyección/ModificadoresProyección.xlsx'
+    io= 'C:/Users/cristian.segura/Documents/Python/Proyecto2/Proyección de Ventas/3) ModificadoresProyección/ModificadoresProyección.xlsx'
                             , sheet_name='ExtraContenido'
                             , header=0
                             , names=None
@@ -783,15 +925,12 @@ df_Valorizacion['VALOR_NETO_PROY'] = (df_Valorizacion['VALORTOTAL_PRODREGULAR_PR
 # Segmento 14: Eliminación de Columnas
 # ----------------------------------------------
 #'KILO_HISTORICO',
-Drop_Columns = df_Valorizacion[[ 'LLAVE','NOMBRE_CATEGORIA_y'
-                                , 'CODI_CANALSUPE_y', 'CLIENTE_y'
-                                , 'VALORTOTAL_PRODREGULAR'
-                                , 'DESC_GRUPO_y', 'SUBGRUPO_y'
-                                , 'CODI_CANALAGRUP_y', 'CODI_REGIONAL_y', 'COD ARTICULO_y'
-                                , 'MARCA_y', 'PRESENTACIÓN_y', 'TAMAÑO_y', 'TIPO_OFERTA_y'
-                                , 'VALOR_DESC', 'VALOR_DEVO'
-                                , 'CARTERA', 'DESC_POSV', 'VALOR_INVERSI_PROMOC'
-                                , 'EXTRAC', 'PRODREGULAR X KILO', 'VALOR_DESC %'
+Drop_Columns = df_Valorizacion[[ 'LLAVE','CODI_CANALSUPE_y', 'CLIENTE_y'
+                                , 'CODI_REGIONAL_y', 'COD ARTICULO_y'
+                                #, 'MARCA_y', 'PRESENTACIÓN_y', 'TAMAÑO_y', 'TIPO_OFERTA_y'
+                                , 'VALOR_DESC', 'VALOR_DEVO','VALORTOTAL_PRODREGULAR'
+                                , 'CARTERA', 'DESC_POSV', 'VALOR_INVERSI_PROMOC'#,   'PRODREGULAR X KILO'
+                                , 'EXTRAC', 'VALOR_DESC %'
                                 , 'VALOR_DEVO %', 'CARTERA %', 'DESC_POSV %'
                                 , 'VALOR_INVERSI_PROMOC %', 'EXTRAC %', 'KILO_NETO'
                                 , 'DESCUENTO', 'OFERTACION', 'INCREMENTO','EXTRA','EXTRAC_PROY1']]
@@ -812,7 +951,7 @@ df_Valorizacion.to_excel(
 print("\n ** Se ha generado el archivo final de proyecciones con éxitos ** ")
 # ----------------------------------------------
 
-
+"""
 # ----------------------------------------------
 # Segmento 16: Diseño Visual del Excel con openpyxl
 # ----------------------------------------------
@@ -872,7 +1011,7 @@ wb.save(archivo_xlsx)
 # Cierra el libro de trabajo
 wb.close()
 # ----------------------------------------------
-
+"""
 
 # ----------------------------------------------
 # Segmento 17: Tiempos de ejecución
